@@ -29,6 +29,6 @@ get '/data.json' do
   
   items = feed.search('item:has(percentageOff)')
   
-  @data = extract_children_from_nodeset(items, ['latitude', 'longitude', 'title'])
+  @data = extract_children_from_nodeset(items, %w[latitude longitude title description])
   @data.to_json
 end

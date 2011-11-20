@@ -3,11 +3,15 @@
   %head
     %title Scoutmob
     :css
-      #map_canvas { width: 500px; height: 500px; }
+      html { height: 100% }
+      body { margin: 0; width: 100%; height: 100%; }
+      #map_canvas { width: 100%; height: 100%; }
     %script{:type => "text/javascript", :src => "http://maps.googleapis.com/maps/api/js?sensor=false"}
     %script{:type => "text/javascript", :src => "http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"}
     :javascript
       $(function() {
+        var lastOpenInfoWindow = null;
+        
         $.getJSON('data.json', function(data) {
             var map = new google.maps.Map(document.getElementById("map_canvas"), {
               mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -19,17 +23,24 @@
               var position = new google.maps.LatLng(hash['latitude'], hash['longitude']);
               bounds.extend(position);
               
-              new google.maps.Marker({ position: position, map: map, title: hash['title'] });
+              var infowindow = new google.maps.InfoWindow({
+                  content: "<h1>" + hash['title'] + "</h1>" + hash['description']
+              });
+              var marker = new google.maps.Marker({ position: position, map: map, title: hash['title'] });
+              
+              google.maps.event.addListener(marker, 'click', function() {
+                if(lastOpenInfoWindow) {
+                  lastOpenInfoWindow.close();
+                }
+                
+                infowindow.open(map, marker);
+                lastOpenInfoWindow = infowindow;
+              });
             });
             
             map.fitBounds(bounds);
         });
-        
-            
-            
       });
-    
   
   %body
-    %h1 Scoutmob Deals!
     #map_canvas
