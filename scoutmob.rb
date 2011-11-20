@@ -2,11 +2,11 @@
 require 'rubygems'
 require 'sinatra'
 require "sinatra/reloader" if development?
-require 'feedzirra'
+require 'nokogiri'
 
 get '/' do
   rss = File.open('./sample.rss')
-  feed = Feedzirra::Feed.parse(rss.read)
+  feed = Nokogiri::XML.parse(rss.read)
   
-  feed.entries.map(&:title).join('<br>')
+  feed.search('item:has(percentageOff) title').map(&:content).join("<br>\n")
 end
